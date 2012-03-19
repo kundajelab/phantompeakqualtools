@@ -5,9 +5,9 @@
 # Last updated: Oct 8, 2010
 # =============
 # MANDATORY ARGUMENTS
-# -c=<ChIP_tagAlign/BAMFile>, full path and name of tagAlign/BAM file (can be gzipped)
+# -c=<ChIP_tagAlign/BAMFile>, full path and name of tagAlign/BAM file (can be gzipped) (FILE EXTENSION MUST BE tagAlign.gz, tagAlign, bam or bam.gz)
 # MANDATORY ARGUMENT FOR PEAK CALLING
-# -i=<Input_tagAlign/BAMFile>, full path and name of tagAlign/BAM file (can be gzipped)
+# -i=<Input_tagAlign/BAMFile>, full path and name of tagAlign/BAM file (can be gzipped) (FILE EXTENSION MUST BE tagAlign.gz, tagAlign, bam or bam.gz)
 # OPTIONAL ARGUMENTS
 # -s=<min>:<step>:<max> , strand shifts at which cross-correlation is evaluated, default=-100:5:600
 # -speak=<strPeak>, user-defined cross-correlation peak strandshift
@@ -41,9 +41,9 @@ print.usage <- function() {
 # ===================================	
 	cat('Usage: Rscript run_spp.R <options>\n',file=stderr())
 	cat('MANDATORY ARGUMENTS\n',file=stderr())
-	cat('-c=<ChIP_alignFile>, full path and name (or URL) of tagAlign/BAM file (can be gzipped)\n',file=stderr())
+	cat('-c=<ChIP_alignFile>, full path and name (or URL) of tagAlign/BAM file (can be gzipped)(FILE EXTENSION MUST BE tagAlign.gz, tagAlign, bam or bam.gz) \n',file=stderr())
 	cat('MANDATORY ARGUMENTS FOR PEAK CALLING\n',file=stderr())
-	cat('-i=<Input_alignFile>, full path and name (or URL) of tagAlign/BAM file (can be gzipped)\n',file=stderr())
+	cat('-i=<Input_alignFile>, full path and name (or URL) of tagAlign/BAM file (can be gzipped) (FILE EXTENSION MUST BE tagAlign.gz, tagAlign, bam or bam.gz) \n',file=stderr())
 	cat('OPTIONAL ARGUMENTS\n',file=stderr())
 	cat('-s=<min>:<step>:<max> , strand shifts at which cross-correlation is evaluated, default=-100:5:600\n',file=stderr())
 	cat('-speak=<strPeak>, user-defined cross-correlation peak strandshift\n',file=stderr())
