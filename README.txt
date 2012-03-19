@@ -22,13 +22,15 @@ DEPENDENCIES:
 ===========================
 unix,bash,R-2.10 and above,awk,samtools,boost C++ libraries
 R packages: SPP, caTools, snow
+NOTE: The current package does not run on a MAC or WINDOWS.
 
 ===========================
 FILES:
 ===========================
 (1) spp_1.10.1.tar.gz  : modified SPP peak-caller package (The original SPP-peak caller package was written by Peter Kharchenko[2])
-(2) run_spp.R         : The script to compute the frag length and/or peak calling
-(3) README.txt        : This README
+(2) run_spp.R          : The script to compute the frag length, data quality characteristics based on cross-correlation analysis and/or peak calling
+(3) run_spp_nodups.R   : (FOR DATASETS WHERE DUPLICATES ARE REMOVED i.e. MAX 1 READ STARTING AT ANY GENOMIC LOCATION) The script to compute the frag length, data quality characteristics based on cross-correlation analysis and/or peak calling
+(4) README.txt         : This README
 
 ============================
 INSTALLATION:
@@ -45,12 +47,12 @@ e.g synaptic package manager (apt-get) for ubuntu or emerge for gentoo.
 from within R
 install.packages([packageName],dependencies=TRUE)
 
-(4) You can then install the SPP package spp_1.10.tar.gz
+(4) You can then install the SPP package spp_1.10.X.tar.gz
 <From your bash shell>
-	R CMD INSTALL spp_1.10.tar.gz
+	R CMD INSTALL spp_1.10.X.tar.gz
 
 <From within R>
-	install.packages('spp_1.10.tar.gz',dependencies=TRUE)
+	install.packages('spp_1.10.X.tar.gz',dependencies=TRUE)
 
 (5) If your alignment files are BAM, you must have the samtools executable in your path so that the R script run_spp.R can call it using the system() command
 You can get samtools from here http://samtools.sourceforge.net/
@@ -66,10 +68,10 @@ GENERAL USAGE
 Usage: Rscript run_spp.R <options>
 
 MANDATORY ARGUMENTS
--c=<ChIP_alignFile>, full path and name (or URL) of tagAlign/BAM file (can be gzipped)
+-c=<ChIP_alignFile>, full path and name (or URL) of tagAlign/BAM file (can be gzipped) (FILE EXTENSION MUST BE tagAlign.gz, tagAlign, bam or bam.gz)
 
 MANDATORY ARGUMENTS FOR PEAK CALLING
--i=<Input_alignFile>, full path and name (or URL) of tagAlign/BAM file (can be gzipped)
+-i=<Input_alignFile>, full path and name (or URL) of tagAlign/BAM file (can be gzipped) (FILE EXTENSION MUST BE tagAlign.gz, tagAlign, bam or bam.gz)
 
 OPTIONAL ARGUMENTS
 -s=<min>:<step>:<max> , strand shifts at which cross-correlation is evaluated, default=-100:5:600
@@ -120,10 +122,12 @@ COL11: QualityTag: Quality tag based on relPhantomPeakCoeff (codes: -2:veryLow,-
 You can run the program on multiple datasets in parallel and append all the quality information to the same <outFile> for a summary analysis.
 
 NSC values range from a minimum of 1 to larger positive numbers. 1.1 is the critical threshold. 
-Datasets with NSC values much less than 1.1 (< 1.08) tend to have low signal to noise.
+Datasets with NSC values much less than 1.1 (< 1.05) tend to have low signal to noise or few peaks (this could be biological eg.a factor that truly binds only a few sites in a particular tissue type OR it could be due to poor quality)
 
 RSC values range from 0 to larger positive values. 1 is the critical threshold.
-RSC values significantly lower than 1 (< 0.8) tend to have low signal to noise. Qtag is a thresholded version of RSC.
+RSC values significantly lower than 1 (< 0.8) tend to have low signal to noise. The low scores can be due to failed and poor quality ChIP, low read sequence quality and hence lots of mismappings, shallow sequencing depth (significantly below saturation) or a combination of these. Like the NSC, datasets with few binding sites (< 200) which is biologically justifiable also show low RSC scores.
+
+Qtag is a thresholded version of RSC.
 
 (2) Peak calling
 
