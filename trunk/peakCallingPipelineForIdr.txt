@@ -1,0 +1,282 @@
+IDR Peak calling Pipeline:
+Feb 9 2012
+Anshul Kundaje
+akundaje _at_ stanford _dot_ edu
+
+Please read the README.txt file in the SPP package first before reading this ..
+
+====================================
+CALL PEAKS ON INDIVIDUAL REPLICATES
+====================================
+- Lets say we have a particular TF ChIP set dataset. I will refer to it as chipSample from here on.
+
+- Lets say we have 3 replicates for chipSample named
+	- chipSampleRep1.tagAlign.gz
+	- chipSampleRep2.tagAlign.gz
+	- chipSampleRep3.tagAlign.gz
+	
+- Each of the ChIP replicates might be paired with its own input/control tagAlign file or a single tagAlign file.
+	- controlSampleRep1.tagAlign.gz
+	- controlSampleRep2.tagAlign.gz
+	- controlSampleRep3.tagAlign.gz
+	
+- The first thing we need to do is pool all control datasets that correspond to all replicates of chipSample i.e. simply concatenate the control tagAlign files.
+zcat controlSampleRep1.tagAlign.gz controlSampleRep2.tagAlign.gz controlSampleRep3.tagAlign.gz | gzip -c > controlSampleRep0.tagAlign.gz
+
+- Now we are ready to call peaks on each of the original replicates (REMEMBER TO USE RELAXED THRESHOLDS AND TRY TO CALL 150k to 300k peaks even if most of them are noise)
+Rscript run_spp.R -c=chipSampleRep1.tagAlign.gz -i=controlSampleRep0.tagAlign.gz -npeak=300000 -odir=/peaks/reps -savr -savp -rf -out=/stats/phantomPeakStatsReps.tab
+Rscript run_spp.R -c=chipSampleRep2.tagAlign.gz -i=controlSampleRep0.tagAlign.gz -npeak=300000 -odir=/peaks/reps -savr -savp -rf -out=/stats/phantomPeakStatsReps.tab
+Rscript run_spp.R -c=chipSampleRep3.tagAlign.gz -i=controlSampleRep0.tagAlign.gz -npeak=300000 -odir=/peaks/reps -savr -savp -rf -out=/stats/phantomPeakStatsReps.tab
+
+If you are using the MACS 1.4 peak caller then you can use a p-value threshold of 1e-2, as this p-value allows one to obtain large number of peaks. Then truncate the peak list to 150K to 300K peaks.
+
+macs14 -t chipSampleRep1.tagAlign.gz -c controlSampleRep0.tagAlign.gz -f BED -n chipSampleRep1_VS_controlSampleRep0 -g hs -p 1e-2 -m 5,30
+macs14 -t chipSampleRep2.tagAlign.gz -c controlSampleRep0.tagAlign.gz -f BED -n chipSampleRep2_VS_controlSampleRep0 -g hs -p 1e-2 -m 5,30
+macs14 -t chipSampleRep3.tagAlign.gz -c controlSampleRep0.tagAlign.gz -f BED -n chipSampleRep3_VS_controlSampleRep0 -g hs -p 1e-2 -m 5,30
+
+MACS will often not estimate the fragment length parameter accurately (it will estimate it as the read length) which can cause severely suboptimal peak calling. One can estimate this parameter far more robustly using strand cross-correlation analysis. Use this package (http://www.ebi.ac.uk/~anshul/public/softwareRepo/spp_package.tar.gz) to estimate fragment length. Then use the following MACS commands
+
+macs14 -t chipSampleRep1.tagAlign.gz -c controlSampleRep0.tagAlign.gz -f BED -n chipSampleRep1_VS_controlSampleRep0 -g hs -p 1e-2 --shift-size=[FRAGLEN/2] --nomodel
+macs14 -t chipSampleRep2.tagAlign.gz -c controlSampleRep0.tagAlign.gz -f BED -n chipSampleRep2_VS_controlSampleRep0 -g hs -p 1e-2 --shift-size=[FRAGLEN/2] --nomodel
+macs14 -t chipSampleRep3.tagAlign.gz -c controlSampleRep0.tagAlign.gz -f BED -n chipSampleRep3_VS_controlSampleRep0 -g hs -p 1e-2 --shift-size=[FRAGLEN/2] --nomodel
+
+MACS will generate '_peaks.xls' files that will have the relevant peak information. You can convert these to narrowPeak files using the macs2npk.sh bash script (http://www.ebi.ac.uk/~anshul/public/softwareRepo/macs2npk.sh).
+This script will sort the peaks by p-value and then convert to narrowPeak format (NOTE: It will NOT truncate the peak list to 300K peaks)
+
+macs2npk.sh chipSampleRep1_VS_controlSampleRep0_peaks.xls /peaks/reps
+macs2npk.sh chipSampleRep2_VS_controlSampleRep0_peaks.xls /peaks/reps
+macs2npk.sh chipSampleRep3_VS_controlSampleRep0_peaks.xls /peaks/reps
+
+	
+- This will generate 3 peak files in directory /peaks/reps/
+	chipSampleRep1_VS_controlSampleRep0.regionPeak.gz
+	chipSampleRep2_VS_controlSampleRep0.regionPeak.gz
+	chipSampleRep3_VS_controlSampleRep0.regionPeak.gz
+
+- Phantom peak quality measures for the 3 runs will be appended to file /stats/phantomPeakStats.tab if you are using SPP scripts for peak calling.
+(See README.txt in the peak calling package for details about the phantom peak quality measures files)
+
+- For MACS peak calls remember to truncate the peak files to the top 300K peaks.
+
+zcat chipSampleRep1_VS_controlSampleRep0.regionPeak.gz | head -n 300000 | gzip -c > temp; mv temp chipSampleRep1_VS_controlSampleRep0.regionPeak.gz
+zcat chipSampleRep2_VS_controlSampleRep0.regionPeak.gz | head -n 300000 | gzip -c > temp; mv temp chipSampleRep2_VS_controlSampleRep0.regionPeak.gz
+zcat chipSampleRep3_VS_controlSampleRep0.regionPeak.gz | head -n 300000 | gzip -c > temp; mv temp chipSampleRep3_VS_controlSampleRep0.regionPeak.gz
+
+From here on I only give SPP commands but you can use MACS commands similar to the ones used above ..
+
+====================================
+CALL PEAKS ON POOLED REPLICATES
+====================================
+- Now pool all ChIP replicates
+zcat chipSampleRep1.tagAlign.gz chipSampleRep2.tagAlign.gz chipSampleRep3.tagAlign.gz | gzip -c > chipSampleRep0.tagAlign.gz
+	
+- Call peaks on the pooled data (REMEMBER TO USE RELAXED THRESHOLDS AND TRY TO CALL 150k to 300k peaks even if most of them are noise)
+Rscript run_spp.R -c=chipSampleRep0.tagAlign.gz -i=controlSampleRep0.tagAlign.gz -npeak=300000 -odir=/peaks/pooled/ -savr -savp -rf
+	
+- This will generate a peak file in directory /peaks/pooled
+	chipSampleRep0_VS_controlSampleRep0.regionPeak.gz
+	
+==================================================
+FOR SELF-CONSISTENCY ANALYSIS CALL PEAKS ON PSEUDOREPLICATES OF INDIVIDUAL REPLICATES
+==================================================
+For each replicate e.g. chipSampleRep1.tagAlign.gz
+- Randomly split the mapped reads in the tagAlign file into 2 parts (pseudoReplicates) with approximately equal number of reads
+	You can use the following code snippet to do this
+	*NOTE*: It uses the unix 'shuf' command that is standard with most installations. Incase you dont have it, I have included a 64-bit binary in the SPP package.
+	
+fileName='chipSampleRep1.tagAlign.gz' # input tagAlign file name
+outputDir='/mapped/selfPseudoReps' # output directory for pseudoreplicate files
+outputStub='chipSampleRep1' # prefix name for pseudoReplicate files
+
+nlines=$( zcat ${fileName} | wc -l ) # Number of reads in the tagAlign file
+nlines=$(( (nlines + 1) / 2 )) # half that number
+zcat "${fileName}" | shuf | split -d -l ${nlines} - "${outputDir}/${outputStub}" # This will shuffle the lines in the file and split it into two parts
+gzip "${outputDir}/${outputStub}00"
+gzip "${outputDir}/${outputStub}01"
+mv "${outputDir}/${outputStub}00.gz" "${outputDir}/${outputStub}.pr1.tagAlign.gz"
+mv "${outputDir}/${outputStub}01.gz" "${outputDir}/${outputStub}.pr2.tagAlign.gz"
+
+- You will now have 2 self-pseudoReplicates in the directory named /mapped/selfPseudoReps/
+	chipSampleRep1.pr1.tagAlign.gz
+	chipSampleRep1.pr2.tagAlign.gz
+
+- Now call peaks on each of these using the pooled control dataset as the control (REMEMBER TO USE RELAXED THRESHOLDS AND TRY TO CALL 150k to 300k peaks even if most of them are noise)
+Rscript run_spp.R -c=/mapped/selfPseudoReps/chipSampleRep1.pr1.tagAlign.gz -i=controlSampleRep0.tagAlign.gz -npeak=300000 -odir=/peaks/selfPseudoReps -savr -savp -rf
+Rscript run_spp.R -c=/mapped/selfPseudoReps/chipSampleRep1.pr2.tagAlign.gz -i=controlSampleRep0.tagAlign.gz -npeak=300000 -odir=/peaks/selfPseudoReps -savr -savp -rf
+
+- This will create two peak files in the directory /peaks/selfPseudoReps
+	chipSampleRep1.pr1_VS_controlSampleRep0.regionPeak.gz
+	chipSampleRep1.pr2_VS_controlSampleRep0.regionPeak.gz
+	
+==================================================
+CREATE PSEUDOREPLICATES OF POOLED DATA AND CALL PEAKS
+==================================================
+- Now, we create pseudoReplicates on the pooled data (same code as above)
+
+fileName='chipSampleRep0.tagAlign.gz' # input tagAlign file name
+outputDir='/mapped/pooledPseudoReps' # output directory for pseudoreplicate files
+outputStub='chipSampleRep0' # prefix name for pseudoReplicate files
+
+nlines=$( zcat ${fileName} | wc -l ) # Number of reads in the tagAlign file
+nlines=$(( (nlines + 1) / 2 )) # half that number
+zcat "${fileName}" | shuf | split -d -l ${nlines} - "${outputDir}/${outputStub}" # This will shuffle the lines in the file and split it into two parts
+gzip "${outputDir}/${outputStub}00"
+gzip "${outputDir}/${outputStub}01"
+mv "${outputDir}/${outputStub}00.gz" "${outputDir}/${outputStub}.pr1.tagAlign.gz"
+mv "${outputDir}/${outputStub}01.gz" "${outputDir}/${outputStub}.pr2.tagAlign.gz"
+
+- You will now have 2 pooled-pseudoReplicates in the directory named /mapped/pooledPseudoReps/
+	chipSampleRep0.pr1.tagAlign.gz
+	chipSampleRep0.pr2.tagAlign.gz
+
+- Now call peaks on each of these using the pooled control dataset as the control (REMEMBER TO USE RELAXED THRESHOLDS AND TRY TO CALL 150k to 300k peaks even if most of them are noise)
+Rscript run_spp.R -c=/mapped/selfPseudoReps/chipSampleRep0.pr1.tagAlign.gz -i=controlSampleRep0.tagAlign.gz -npeak=300000 -odir=/peaks/pooledPseudoReps -savr -savp -rf
+Rscript run_spp.R -c=/mapped/selfPseudoReps/chipSampleRep0.pr2.tagAlign.gz -i=controlSampleRep0.tagAlign.gz -npeak=300000 -odir=/peaks/pooledPseudoReps -savr -savp -rf
+
+- This will create two peak files in the directory /peaks/pooledPseudoReps
+	chipSampleRep0.pr1_VS_controlSampleRep0.regionPeak.gz
+	chipSampleRep0.pr2_VS_controlSampleRep0.regionPeak.gz
+
+===============================
+INPUT TO IDR ANALYSIS
+===============================
+For IDR analysis, we always compare a pair of peak files
+
+For dataset chipSample, we will have ended up with the following files
+
+PEAKS ON ORIGINAL REPLICATES
+	chipSampleRep1_VS_controlSampleRep0.regionPeak.gz
+	chipSampleRep2_VS_controlSampleRep0.regionPeak.gz
+	chipSampleRep3_VS_controlSampleRep0.regionPeak.gz
+
+PEAKS ON SELF-PSEUDOREPLICATES
+	chipSampleRep1.pr1_VS_controlSampleRep0.regionPeak.gz
+	chipSampleRep1.pr2_VS_controlSampleRep0.regionPeak.gz
+
+	chipSampleRep2.pr1_VS_controlSampleRep0.regionPeak.gz
+	chipSampleRep2.pr2_VS_controlSampleRep0.regionPeak.gz
+
+	chipSampleRep3.pr1_VS_controlSampleRep0.regionPeak.gz
+	chipSampleRep3.pr2_VS_controlSampleRep0.regionPeak.gz
+	
+PEAKS ON POOLED PSEUDOREPLICATES
+	chipSampleRep0.pr1_VS_controlSampleRep0.regionPeak.gz
+	chipSampleRep0.pr2_VS_controlSampleRep0.regionPeak.gz
+
+===============================
+IDR ANALYSIS ON ORIGINAL REPLICATES
+===============================
+We will perform the following pairwise analyses 
+/peaks/reps/chipSampleRep1_VS_controlSampleRep0.regionPeak.gz AND /peaks/reps/chipSampleRep2_VS_controlSampleRep0.regionPeak.gz
+/peaks/reps/chipSampleRep1_VS_controlSampleRep0.regionPeak.gz AND /peaks/reps/chipSampleRep3_VS_controlSampleRep0.regionPeak.gz
+/peaks/reps/chipSampleRep2_VS_controlSampleRep0.regionPeak.gz AND /peaks/reps/chipSampleRep3_VS_controlSampleRep0.regionPeak.gz
+
+First gunzip all the peak files
+
+Then run the IDR analysis on all pairs
+
+Rscript batch-consistency-analysis.r /peaks/reps/chipSampleRep1_VS_controlSampleRep0.regionPeak /peaks/reps/chipSampleRep2_VS_controlSampleRep0.regionPeak -1 /consistency/reps/chipSampleRep1_VS_chipSampleRep2 0 F signal.value
+Rscript batch-consistency-analysis.r /peaks/reps/chipSampleRep1_VS_controlSampleRep0.regionPeak /peaks/reps/chipSampleRep3_VS_controlSampleRep0.regionPeak -1 /consistency/reps/chipSampleRep1_VS_chipSampleRep3 0 F signal.value
+Rscript batch-consistency-analysis.r /peaks/reps/chipSampleRep2_VS_controlSampleRep0.regionPeak /peaks/reps/chipSampleRep3_VS_controlSampleRep0.regionPeak -1 /consistency/reps/chipSampleRep2_VS_chipSampleRep3 0 F signal.value
+
+If you are using peaks based on the MACS peak caller, then use p.value as the ranking measure and also set max peak half-width to 200 bp (since MACS tends to call wider peaks with relaxed p-value thresholds of 1e-2)
+
+Rscript batch-consistency-analysis.r /peaks/reps/chipSampleRep1_VS_controlSampleRep0.regionPeak /peaks/reps/chipSampleRep2_VS_controlSampleRep0.regionPeak 200 /consistency/reps/chipSampleRep1_VS_chipSampleRep2 0 F p.value
+Rscript batch-consistency-analysis.r /peaks/reps/chipSampleRep1_VS_controlSampleRep0.regionPeak /peaks/reps/chipSampleRep3_VS_controlSampleRep0.regionPeak 200 /consistency/reps/chipSampleRep1_VS_chipSampleRep3 0 F p.value
+Rscript batch-consistency-analysis.r /peaks/reps/chipSampleRep2_VS_controlSampleRep0.regionPeak /peaks/reps/chipSampleRep3_VS_controlSampleRep0.regionPeak 200 /consistency/reps/chipSampleRep2_VS_chipSampleRep3 0 F p.value
+
+You can plot the IDR plots using
+Rscript batch-consistency-plot.r 3 /consistency/reps/chipSampleAllReps /consistency/reps/chipSampleRep1_VS_chipSampleRep2 /consistency/reps/chipSampleRep1_VS_chipSampleRep3 /consistency/reps/chipSampleRep2_VS_chipSampleRep3
+
+===============================
+IDR ANALYSIS ON SELF-PSEUDOREPLICATES
+===============================
+We will perform the following pairwise analyses 
+/peaks/selfPseudoReps/chipSampleRep1.pr1_VS_controlSampleRep0.regionPeak.gz AND /peaks/selfPseudoReps/chipSampleRep1.pr2_VS_controlSampleRep0.regionPeak.gz
+/peaks/selfPseudoReps/chipSampleRep2.pr1_VS_controlSampleRep0.regionPeak.gz AND /peaks/selfPseudoReps/chipSampleRep2.pr2_VS_controlSampleRep0.regionPeak.gz
+/peaks/selfPseudoReps/chipSampleRep3.pr1_VS_controlSampleRep0.regionPeak.gz AND /peaks/selfPseudoReps/chipSampleRep3.pr2_VS_controlSampleRep0.regionPeak.gz
+
+First gunzip all the peak files
+
+Then run the IDR analysis on all pairs
+
+Rscript batch-consistency-analysis.r /peaks/selfPseudoReps/chipSampleRep1.pr1_VS_controlSampleRep0.regionPeak /peaks/selfPseudoReps/chipSampleRep1.pr2_VS_controlSampleRep0.regionPeak -1 /consistency/selfPseudoReps/chipSampleRep1.pr1_VS_chipSampleRep1.pr2 0 F signal.value
+Rscript batch-consistency-analysis.r /peaks/selfPseudoReps/chipSampleRep2.pr1_VS_controlSampleRep0.regionPeak /peaks/selfPseudoReps/chipSampleRep2.pr2_VS_controlSampleRep0.regionPeak -1 /consistency/selfPseudoReps/chipSampleRep2.pr1_VS_chipSampleRep2.pr2 0 F signal.value
+Rscript batch-consistency-analysis.r /peaks/selfPseudoReps/chipSampleRep3.pr1_VS_controlSampleRep0.regionPeak /peaks/selfPseudoReps/chipSampleRep3.pr2_VS_controlSampleRep0.regionPeak -1 /consistency/selfPseudoReps/chipSampleRep3.pr1_VS_chipSampleRep3.pr2 0 F signal.value
+
+You can plot the IDR plots using
+Rscript batch-consistency-plot.r 3 /consistency/selfPseudoReps/chipSampleAllSelfReps /consistency/selfPseudoReps/chipSampleRep1.pr1_VS_chipSampleRep1.pr2 /consistency/selfPseudoReps/chipSampleRep2.pr1_VS_chipSampleRep2.pr2 /consistency/selfPseudoReps/chipSampleRep3.pr1_VS_chipSampleRep3.pr2
+
+===============================
+IDR ANALYSIS ON POOLED-PSEUDOREPLICATES
+===============================
+We will perform the following pairwise analyses 
+/peaks/pooledPseudoReps/chipSampleRep0.pr1_VS_controlSampleRep0.regionPeak.gz AND /peaks/pooledPseudoReps/chipSampleRep0.pr2_VS_controlSampleRep0.regionPeak.gz
+
+First gunzip all the peak files
+
+Then run the IDR analysis on all pairs
+
+Rscript batch-consistency-analysis.r /peaks/pooledPseudoReps/chipSampleRep0.pr1_VS_controlSampleRep0.regionPeak /peaks/pooledPseudoReps/chipSampleRep0.pr2_VS_controlSampleRep0.regionPeak -1 /consistency/pooledPseudoReps/chipSampleRep0.pr1_VS_chipSampleRep0.pr2 0 F signal.value
+
+You can plot the IDR plots using
+Rscript batch-consistency-plot.r 1 /consistency/pooledPseudoReps/chipSamplePooledReps /consistency/pooledPseudoReps/chipSampleRep0.pr1_VS_chipSampleRep0.pr2
+
+===============================
+GETTING THRESHOLDS TO TRUNCATE PEAK LISTS
+===============================
+
+The following IDR thresholds are recommended for the different types of IDR analyses.
+
+For self-consistency and comparison of true replicates
+
+- If you started with ~150 to 300K relaxed pre-IDR peaks for large genomes (human/mouse), then threshold of 0.01 or 0.02 generally works well. For smaller genomes such as worm, if you start with ~15K to 40K peaks then once again IDR thresholds of 0.01 or 0.02 work well.
+- If you started with < 100K pre-IDR peaks for large genomes (human/mouse), then threshold of 0.05 is more appropriate. This is because the IDR sees a smaller noise component and the IDR scores get weaker. This is typically for use with peak callers that are unable to be adjusted to call large number of peaks (eg. PeakSeq or QuEST)
+- For self-consistency analysis of datasets with shallow sequencing depths, you can use an IDR threshold as relaxed as 0.1 if you start with < 100K pre-IDR peaks.
+
+For pooled-consistency analysis
+- If you started with ~150 to 300K relaxed pre-IDR peaks for large genomes (human/mouse), then threshold of 0.0025 or 0.005 generally works well. For smaller genomes such as worm, if you start with ~15K to 40K peaks then once again IDR thresholds of 0.01 work well. We use a tighter threshold for pooled-consistency since pooling and subsampling equalizes the pseudo-replicates in terms of data quality. So we err on the side of caution and use more stringent thresholds.
+- If you started with < 100K pre-IDR peaks for large genomes (human/mouse) , then threshold of 0.01 is more appropriate. This is because the IDR sees a smaller noise component and the IDR scores get weaker so we have to relax the thresholds. This is typically for use with peak callers that are unable to be adjusted to call large number of peaks (eg. PeakSeq or QuEST)
+
+Each of these comparisons will give us a certain number of peaks that pass their respective IDR thresholds
+We will refer to them as follows
+
+ORIGINAL REPLICATE THRESHOLD
+numPeaks_Rep1_Rep2=$( awk '$11 <= 0.01 {print $0}' /consistency/reps/chipSampleRep1_VS_chipSampleRep2-overlapped-peaks.txt | wc -l )
+numPeaks_Rep1_Rep3=$( awk '$11 <= 0.01 {print $0}' /consistency/reps/chipSampleRep1_VS_chipSampleRep3-overlapped-peaks.txt | wc -l )
+numPeaks_Rep2_Rep3=$( awk '$11 <= 0.01 {print $0}' /consistency/reps/chipSampleRep2_VS_chipSampleRep3-overlapped-peaks.txt | wc -l )
+
+We pick the maximum value out of these 3. Lets call it 'max_numPeaks_Rep'
+
+SELF-CONSISTENCY THRESHOLDS
+numPeaks_Rep1_pr=$( awk '$11 <= 0.02 {print $0}' /consistency/selfPseudoReps/chipSampleRep1.pr1_VS_chipSampleRep1.pr2-overlapped-peaks.txt | wc -l )
+numPeaks_Rep2_pr=$( awk '$11 <= 0.02 {print $0}' /consistency/selfPseudoReps/chipSampleRep2.pr1_VS_chipSampleRep2.pr2-overlapped-peaks.txt | wc -l )
+numPeaks_Rep3_pr=$( awk '$11 <= 0.02 {print $0}' /consistency/selfPseudoReps/chipSampleRep3.pr1_VS_chipSampleRep3.pr2-overlapped-peaks.txt | wc -l )
+
+These 3 numbers should be in a similar range. If any of these is substantially different from the others, it points that replicate being different in some way.
+You should also refer back to the phantom peak coefficient and sequencing depth for the replicates as this can further support enrichment/undesequencing problems.
+
+POOLED-PSEUDOREPLICATE THRESHOLD
+numPeaks_Rep0=$( awk '$11 <= 0.0025 {print $0}' /consistency/pooledPseudoReps/chipSampleRep0.pr1_VS_chipSampleRep0.pr2-overlapped-peaks.txt | wc -l )
+
+Typically if the self-consistency thresholds are all similar i.e. the replicates are very similar to each other, then max_numPeaks_Rep and numPeaks_Rep0 should be similar.
+If numPeaks_Rep0 is substantially greater than max_numPeaks_Rep, then you have rescued the dataset since it likely had some weak/different replicates.
+
+=======================
+FINAL SET OF PEAK CALLS
+=======================
+You can now generate a conservative and an optimal final set of peak calls for the dataset chipSample
+
+For the conservative set
+- Sort the peaks in chipSampleRep0_VS_controlSampleRep0.regionPeak.gz by the signal.value (or p.value or q.value depending on what you used to rank the peaks in the IDR analysis) column (column 7 is signal.value) in descending order
+- Pick the top max_numPeaks_Rep peaks
+
+zcat chipSampleRep0_VS_controlSampleRep0.regionPeak.gz | sort -k7nr,7nr | head -n [max_numPeaks_Rep] | gzip -c > spp.conservative.chipSampleRep0_VS_controlSampleRep0.regionPeak.gz
+
+For the optimal set
+- Sort the peaks in chipSampleRep0_VS_controlSampleRep0.regionPeak.gz by the signal.value (or p.value or q.value depending on what you used to rank the peaks in the IDR analysis) column (column 7 is signal.value) in descending order
+- Select the maximum of max_numPeaks_Rep and numPeaks_Rep0 i.e. optThresh = max(max_numPeaks_Rep,numPeaks_Rep0)
+- Pick the top 'optThresh' peaks
+
+zcat chipSampleRep0_VS_controlSampleRep0.regionPeak.gz | sort -k7nr,7nr | head -n [optThresh] | gzip -c > spp.conservative.chipSampleRep0_VS_controlSampleRep0.regionPeak.gz
+
