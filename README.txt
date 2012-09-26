@@ -110,14 +110,14 @@ COL3: estFragLen: comma separated strand cross-correlation peak(s) in decreasing
 	  In almost all cases, the top (first) value in the list represents the predominant fragment length.
 	  If you want to keep only the top value simply run
 	  sed -r 's/,[^\t]+//g' <outFile> > <newOutFile>
-COL3: corr_estFragLen: comma separated strand cross-correlation value(s) in decreasing order (col2 follows the same order)
+COL4: corr_estFragLen: comma separated strand cross-correlation value(s) in decreasing order (col2 follows the same order)
 COL5: phantomPeak: Read length/phantom peak strand shift
 COL6: corr_phantomPeak: Correlation value at phantom peak
 COL7: argmin_corr: strand shift at which cross-correlation is lowest
 COL8: min_corr: minimum value of cross-correlation
-COL9: Normalized strand cross-correlation coefficient (NSC) = COL2 / COL5
-COL10: Relative strand cross-correlation coefficient (RSC) = (COL2 - COL7) / (COL5 - COL7)
-COL11: QualityTag: Quality tag based on relPhantomPeakCoeff (codes: -2:veryLow,-1:Low,0:Medium,1:High,2:veryHigh)
+COL9: Normalized strand cross-correlation coefficient (NSC) = COL4 / COL8
+COL10: Relative strand cross-correlation coefficient (RSC) = (COL4 - COL8) / (COL6 - COL8)
+COL11: QualityTag: Quality tag based on thresholded RSC (codes: -2:veryLow,-1:Low,0:Medium,1:High,2:veryHigh)
 
 You can run the program on multiple datasets in parallel and append all the quality information to the same <outFile> for a summary analysis.
 
