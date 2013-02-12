@@ -1,8 +1,8 @@
 # run_spp.R
 # =============
-# Author: Anshul Kundaje, Computer Science Dept., Stanford University
-# Email: akundaje@stanford.edu
-# Last updated: Oct 8, 2010
+# Author: Anshul Kundaje, Computer Science Dept., MIT
+# Email: anshul@kundaje.net
+# Last updated: Feb 12, 2012
 # =============
 # MANDATORY ARGUMENTS
 # -c=<ChIP_tagAlign/BAMFile>, full path and name of tagAlign/BAM file (can be gzipped) (FILE EXTENSION MUST BE tagAlign.gz, tagAlign, bam or bam.gz)
