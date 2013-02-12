@@ -1,20 +1,20 @@
 ===========================
 Anshul Kundaje
-Date: March 25 2010
-Email: akundaje@stanford.edu
+Date: Feb 13 2012
+Email: anshul@kundaje.net
 Version: 2.0
 ===========================
 This set of programs operate on mapped Illumina single-end read datasets in tagAlign or BAM format.
 They can be used to 
-(1) Compute the predominant insert-size (fragment length) based on strand cross-correlation peak
-(2) Compute Data quality measures based on relative phantom peak
-(3) Call Peaks and regions for punctate binding datasets
+(1) Compute the predominant fragment length based on strand cross-correlation peak
+(2) Compute Data quality measures based on strand cross-correlation analysis and relative phantom peak
+(3) Call Peaks and regions for punctate binding ChIP-seq datasets
 
 ===========================
 CITATIONS:
 ===========================
 If you are using the code or results in any formal publication please cite
-[1] Anshul Kundaje, Computer Science Dept., Stanford University, ENCODE Consortium, Personal Communication, Oct 2010
+[1] Anshul Kundaje, Computer Science Dept., MIT, ENCODE Consortium, http://code.google.com/p/phantompeakqualtools, Feb 2013
 [2] Kharchenko PK, Tolstorukov MY, Park PJ, Design and analysis of ChIP-seq experiments for DNA-binding proteins Nat Biotechnol. 2008 Dec;26(12):1351-9
 
 ===========================
@@ -99,7 +99,8 @@ TYPICAL USAGE
 (1) Determine strand cross-correlation peak / predominant fragment length OR print out quality measures
 	
 	Rscript run_spp.R -c=<tagAlign/BAMfile> -savp -out=<outFile>
-	
+
+-savp will create a pdf showing the cross-correlation plot
 -out=<outFile> will create and/or append to a file named <outFile> several important characteristics of the dataset.
 The file contains 11 tab delimited columns
 
@@ -200,4 +201,3 @@ signalValue	 float	 Measurement of overall (usually, average) enrichment for the
 pValue	 float	 Measurement of statistical signficance (-log10). Use -1 if no pValue is assigned.
 qValue	 float	 Measurement of statistical significance using false discovery rate (-log10). Use -1 if no qValue is assigned.
 peak	 int	 Point-source called for this peak; 0-based offset from chromStart. Use -1 if no point-source called.
-
