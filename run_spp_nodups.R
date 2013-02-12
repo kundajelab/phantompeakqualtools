@@ -60,7 +60,7 @@ print.usage <- function() {
 	cat('-savd=<rdatafile> OR -savd, save Rdata file\n',file=stderr())
 	cat('-savp=<plotdatafile> OR -savp, save cross-correlation plot\n',file=stderr())
 	cat('-out=<resultfile>, append peakshift/phantomPeak results to a file\n',file=stderr())
-	cat('     format:Filename<tab>numReads<tab>estFragLen<tab>corr_estFragLen<tab>PhantomPeak<tab>corr_phantomPeak<tab>argmin_corr<tab>min_corr<tab>phantomPeakCoef<tab>relPhantomPeakCoef<tab>QualityTag)\n',file=stderr())
+	cat('     format:Filename<tab>numReads<tab>estFragLen<tab>corr_estFragLen<tab>PhantomPeak<tab>corr_phantomPeak<tab>argmin_corr<tab>min_corr<tab>Normalized SCC (NSC)<tab>Relative SCC (RSC)<tab>QualityTag)\n',file=stderr())
 	cat('-rf, if plot or rdata or narrowPeak file exists replace it. If not used then the run is aborted if the plot or Rdata or narrowPeak file exists\n',file=stderr())
 	cat('-clean, if present will remove the original chip and control files after reading them in. CAUTION: Use only if the script calling run_spp.R is creating temporary files\n',file=stderr())
 } # end: print.usage()
