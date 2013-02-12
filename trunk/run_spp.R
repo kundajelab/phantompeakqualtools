@@ -726,7 +726,7 @@ peakidx <- which(peakidx==-1) + bw
 if ( is.nan(iparams$ex.range[2]) ) {
 	iparams$ex.range[2] <- chip.data$read.length+10
 }
-peakidx <- peakidx[(cc$x[peakidx] < iparams$ex.range[1]) | (cc$x[peakidx] > iparams$ex.range[2])]    
+peakidx <- peakidx[(cc$x[peakidx] < iparams$ex.range[1]) | (cc$x[peakidx] > iparams$ex.range[2]) | (cc$x[peakidx] < 0) ]    
 cc <- cc[peakidx,]
 
 # Find max peak position and other peaks within 0.9*max_peakvalue that are further away from maxpeakposition   
