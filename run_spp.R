@@ -9,7 +9,7 @@
 # MANDATORY ARGUMENT FOR PEAK CALLING
 # -i=<Input_tagAlign/BAMFile>, full path and name of tagAlign/BAM file (can be gzipped) (FILE EXTENSION MUST BE tagAlign.gz, tagAlign, bam or bam.gz)
 # OPTIONAL ARGUMENTS
-# -s=<min>:<step>:<max> , strand shifts at which cross-correlation is evaluated, default=-100:5:600
+# -s=<min>:<step>:<max> , strand shifts at which cross-correlation is evaluated, default=-500:5:1500
 # -speak=<strPeak>, user-defined cross-correlation peak strandshift
 # -x=<min>:<max>, strand shifts to exclude (This is mainly to avoid phantom peaks) default=10:(readlen+10)
 # -p=<nodes> , number of parallel processing nodes, default=NULL
@@ -45,7 +45,7 @@ print.usage <- function() {
 	cat('MANDATORY ARGUMENTS FOR PEAK CALLING\n',file=stderr())
 	cat('-i=<Input_alignFile>, full path and name (or URL) of tagAlign/BAM file (can be gzipped) (FILE EXTENSION MUST BE tagAlign.gz, tagAlign, bam or bam.gz) \n',file=stderr())
 	cat('OPTIONAL ARGUMENTS\n',file=stderr())
-	cat('-s=<min>:<step>:<max> , strand shifts at which cross-correlation is evaluated, default=-100:5:600\n',file=stderr())
+	cat('-s=<min>:<step>:<max> , strand shifts at which cross-correlation is evaluated, default=-500:5:1500\n',file=stderr())
 	cat('-speak=<strPeak>, user-defined cross-correlation peak strandshift\n',file=stderr())
 	cat('-x=<min>:<max>, strand shifts to exclude (This is mainly to avoid region around phantom peak) default=10:(readlen+10)\n',file=stderr())
 	cat('-p=<nodes> , number of parallel processing nodes, default=0\n',file=stderr())
@@ -60,7 +60,7 @@ print.usage <- function() {
 	cat('-savd=<rdatafile> OR -savd, save Rdata file\n',file=stderr())
 	cat('-savp=<plotdatafile> OR -savp, save cross-correlation plot\n',file=stderr())
 	cat('-out=<resultfile>, append peakshift/phantomPeak results to a file\n',file=stderr())
-	cat('     format:Filename<tab>numReads<tab>estFragLen<tab>corr_estFragLen<tab>PhantomPeak<tab>corr_phantomPeak<tab>argmin_corr<tab>min_corr<tab>phantomPeakCoef<tab>relPhantomPeakCoef<tab>QualityTag)\n',file=stderr())
+	cat('     format:Filename<tab>numReads<tab>estFragLen<tab>corr_estFragLen<tab>PhantomPeak<tab>corr_phantomPeak<tab>argmin_corr<tab>min_corr<tab>Normalized SCC (NSC)<tab>Relative SCC (RSC)<tab>QualityTag)\n',file=stderr())
 	cat('-rf, if plot or rdata or narrowPeak file exists replace it. If not used then the run is aborted if the plot or Rdata or narrowPeak file exists\n',file=stderr())
 	cat('-clean, if present will remove the original chip and control files after reading them in. CAUTION: Use only if the script calling run_spp.R is creating temporary files\n',file=stderr())
 } # end: print.usage()
@@ -114,8 +114,8 @@ parse.arguments <- function(args) {
 	isurl.chip.file <- FALSE # flag indicating whether ChIP file is a URL
 	control.file <- NA # control tagAlign/BAM file name
 	isurl.control.file <- FALSE # flag indicating whether control file is a URL   
-	sep.min <- -100  # min strand shift
-	sep.max <- 600  # max strand shift
+	sep.min <- -500  # min strand shift
+	sep.max <- 1500  # max strand shift
 	sep.bin <- 5    # increment for strand shift
 	sep.peak <- NA # user-defined peak shift
 	exclude.min <- 10 # lowerbound of strand shift exclusion region
@@ -710,7 +710,7 @@ if (!is.na(iparams$n.nodes)) {
 
 # Smooth the cross-correlation curve if required
 cc <- crosscorr$cross.correlation
-crosscorr$min.cc <- crosscorr$cross.correlation[ which.min(crosscorr$cross.correlation$y) , ] # minimum value and shift of cross-correlation
+crosscorr$min.cc <- crosscorr$cross.correlation[ length(crosscorr$cross.correlation$y) , ] # minimum value and shift of cross-correlation
 cat("Minimum cross-correlation value", crosscorr$min.cc$y,"\n",file=stdout())
 cat("Minimum cross-correlation shift", crosscorr$min.cc$x,"\n",file=stdout())
 sbw <- 2*floor(ceiling(5/iparams$sep.range[2]) / 2) + 1 # smoothing bandwidth
@@ -745,8 +745,8 @@ cc.peak <- cc[sortidx,]
 if (! is.na(iparams$sep.peak)) {
 	cc.peak <- approx(crosscorr$cross.correlation$x,crosscorr$cross.correlation$y,iparams$sep.peak,rule=2)
 }
-cat("Peak cross-correlation value", paste(cc.peak$y,collapse=","),"\n",file=stdout())
-cat("Peak strand shift",paste(cc.peak$x,collapse=","),"\n",file=stdout())
+cat("Top 3 cross-correlation values", paste(cc.peak$y,collapse=","),"\n",file=stdout())
+cat("Top 3 estimates for fragment length",paste(cc.peak$x,collapse=","),"\n",file=stdout())
 
 # Reset values in crosscorr
 crosscorr$peak$x <- cc.peak$x[1]
@@ -759,16 +759,16 @@ cat("Window half size",crosscorr$whs,"\n",file=stdout())
 
 # Compute phantom peak coefficient
 ph.peakidx <- which( ( crosscorr$cross.correlation$x >= ( chip.data$read.length - round(2*iparams$sep.range[2]) ) ) & 
-                     ( crosscorr$cross.correlation$x <= ( chip.data$read.length + round(1.5*iparams$sep.range[2]) ) ) )
+                     ( crosscorr$cross.correlation$x <= ( chip.data$read.length + round(2*iparams$sep.range[2]) ) ) )
 ph.peakidx <- ph.peakidx[ which.max(crosscorr$cross.correlation$y[ph.peakidx]) ]
 crosscorr$phantom.cc <- crosscorr$cross.correlation[ph.peakidx,]
 cat("Phantom peak location",crosscorr$phantom.cc$x,"\n",file=stdout())
 cat("Phantom peak Correlation",crosscorr$phantom.cc$y,"\n",file=stdout())
 crosscorr$phantom.coeff <- crosscorr$peak$y / crosscorr$phantom.cc$y
 crosscorr$phantom.coeff <- crosscorr$peak$y / crosscorr$min.cc$y
-cat("Normalized cross-correlation coefficient (NCCC)",crosscorr$phantom.coeff,"\n",file=stdout())
+cat("Normalized Strand cross-correlation coefficient (NSC)",crosscorr$phantom.coeff,"\n",file=stdout())
 crosscorr$rel.phantom.coeff <- (crosscorr$peak$y - crosscorr$min.cc$y) / (crosscorr$phantom.cc$y - crosscorr$min.cc$y)
-cat("Relative Cross correlation Coefficient (RCCC)",crosscorr$rel.phantom.coeff,"\n",file=stdout())
+cat("Relative Strand cross-correlation Coefficient (RSC)",crosscorr$rel.phantom.coeff,"\n",file=stdout())
 crosscorr$phantom.quality.tag <- NA
 if ( (crosscorr$rel.phantom.coeff >= 0) & (crosscorr$rel.phantom.coeff < 0.25) ) {
 	crosscorr$phantom.quality.tag <- -2
@@ -849,7 +849,7 @@ if ( !is.na(iparams$output.npeak.file) || !is.na(iparams$output.rpeak.file) ) {
 	# Find peaks
 	cat('Finding peaks\n',file=stdout())
 	if (!is.na(iparams$npeak)) {
-		iparams$fdr <- 0.96
+		iparams$fdr <- 0.99
 	}
 	narrow.peaks <- find.binding.positions(signal.data=chip.data,control.data=control.data,fdr=iparams$fdr,method=tag.lwcc,whs=crosscorr$whs,cluster=cluster.nodes)
 	if (!is.na(iparams$n.nodes)) {
