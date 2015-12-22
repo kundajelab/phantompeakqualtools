@@ -7,10 +7,8 @@ This package computes quick but highly informative enrichment and quality measur
 
 # References #
 
-_**Assessment of ChIP-seq data quality using cross-correlation analysis (Submitted)**_
-
-Anshul Kundaje`*`, Lucy Yungsook Jung`*`, Peter Kharchenko, Barbara Wold, Arend Sidow, Serafim Batzoglou, Peter Park
-
+ChIP-seq guidelines and practices of the ENCODE and modENCODE consortia. Landt SG*, Marinov GK*, Kundaje A*, Kheradpour P*, Pauli F, Batzoglou S, Bernstein BE, Bickel P, Brown JB, Cayting P, Chen Y, DeSalvo G, Epstein C, Fisher-Aylor KI, Euskirchen G, Gerstein M, Gertz J, Hartemink AJ, Hoffman MM, Iyer VR, Jung YL, Karmakar S, Kellis M, Kharchenko PV, Li Q, Liu T, Liu XS, Ma L, Milosavljevic A, Myers RM, Park PJ, Pazin MJ, Perry MD, Raha D, Reddy TE, Rozowsky J, Shoresh N, Sidow A, Slattery M, Stamatoyannopoulos JA, Tolstorukov MY, White KP, Xi S, Farnham PJ, Lieb JD, Wold BJ, Snyder M.
+Genome Res. 2012 Sep;22(9):1813-31. doi: 10.1101/gr.136184.111.
 
 ---
 
