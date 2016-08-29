@@ -2,7 +2,7 @@
 # =============
 # Author: Anshul Kundaje, Computer Science Dept., MIT
 # Email: anshul@kundaje.net
-# Last updated: Feb 12, 2012
+# Last updated: Aug 29, 2016
 # =============
 # MANDATORY ARGUMENTS
 # -c=<ChIP_tagAlign/BAMFile>, full path and name of tagAlign/BAM file (can be gzipped) (FILE EXTENSION MUST BE tagAlign.gz, tagAlign, bam or bam.gz)
@@ -41,7 +41,7 @@ print.usage <- function() {
 # ===================================	
 	cat('Usage: Rscript run_spp.R <options>\n',file=stderr())
 	cat('MANDATORY ARGUMENTS\n',file=stderr())
-	cat('-c=<ChIP_alignFile>, full path and name (or URL) of tagAlign/BAM file (can be gzipped)(FILE EXTENSION MUST BE tagAlign.gz, tagAlign, bam or bam.gz) \n',file=stderr())
+	cat('-c=<ChIP_alignFile>, full path and name (or URL) of tagAlign/BAM file (can be gzipped) (FILE EXTENSION MUST BE tagAlign.gz, tagAlign, bam or bam.gz) \n',file=stderr())
 	cat('MANDATORY ARGUMENTS FOR PEAK CALLING\n',file=stderr())
 	cat('-i=<Input_alignFile>, full path and name (or URL) of tagAlign/BAM file (can be gzipped) (FILE EXTENSION MUST BE tagAlign.gz, tagAlign, bam or bam.gz) \n',file=stderr())
 	cat('OPTIONAL ARGUMENTS\n',file=stderr())
@@ -759,7 +759,7 @@ cat("Window half size",crosscorr$whs,"\n",file=stdout())
 
 # Compute phantom peak coefficient
 ph.peakidx <- which( ( crosscorr$cross.correlation$x >= ( chip.data$read.length - round(2*iparams$sep.range[2]) ) ) & 
-                     ( crosscorr$cross.correlation$x <= ( chip.data$read.length + round(2*iparams$sep.range[2]) ) ) )
+                     ( crosscorr$cross.correlation$x <= ( chip.data$read.length + round(1.5*iparams$sep.range[2]) ) ) )
 ph.peakidx <- ph.peakidx[ which.max(crosscorr$cross.correlation$y[ph.peakidx]) ]
 crosscorr$phantom.cc <- crosscorr$cross.correlation[ph.peakidx,]
 cat("Phantom peak location",crosscorr$phantom.cc$x,"\n",file=stdout())
@@ -865,7 +865,7 @@ if ( !is.na(iparams$output.npeak.file) || !is.na(iparams$output.rpeak.file) ) {
 	
 	# Compute and write regionPeak file
 	if (!is.na(iparams$output.rpeak.file)) {
-		region.peaks <- add.broad.peak.regions(chip.data,control.data,narrow.peaks,window.size=max(50,round(crosscorr$whs/4)),z.thr=10)
+		region.peaks <- add.broad.peak.regions(chip.data,control.data,narrow.peaks,window.size=max(50,round(crosscorr$whs/4)),z.thr=9)
 		write.narrowpeak.binding(region.peaks,iparams$output.rpeak.file,margin=round(crosscorr$whs/2),npeaks=iparams$npeak)
 		system(paste('gzip -f ',iparams$output.rpeak.file))
 	}
