@@ -111,7 +111,8 @@ Usage: `Rscript run_spp.R <options>`
    
    -out=<outFile> will create and/or append to a file named <outFile> several important characteristics of the dataset.
    ```
-   The file contains 11 tab delimited columns
+   The file contains 11 tab delimited columns.
+
    |col.| abbreviation    | description                                                                                          |
    |----|-----------------|------------------------------------------------------------------------------------------------------|
    |1   | Filename        | tagAlign/BAM filename                                                                                |
