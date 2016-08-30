@@ -80,43 +80,43 @@ Usage: `Rscript run_spp.R <options>`
 
    | argument                | description                                 |
    |-------------------------|---------------------------------------------|
-   |-c=<ChIP_alignFile>      | full path and name (or URL) of tagAlign/BAM file (can be gzipped) (FILE EXTENSION MUST BE tagAlign.gz, tagAlign, bam or bam.gz) |
+   |-c=\<ChIP_alignFile\>    | full path and name (or URL) of tagAlign/BAM file (can be gzipped) (FILE EXTENSION MUST BE tagAlign.gz, tagAlign, bam or bam.gz) |
    
 * MANDATORY ARGUMENTS FOR PEAK CALLING
 
    | argument                | description                                 |
    |-------------------------|---------------------------------------------|
-   |-i=<Input_alignFile>     | full path and name (or URL) of tagAlign/BAM file (can be gzipped) (FILE EXTENSION MUST BE tagAlign.gz, tagAlign, bam or bam.gz) |
+   |-i=\<Input_alignFile\>   | full path and name (or URL) of tagAlign/BAM file (can be gzipped) (FILE EXTENSION MUST BE tagAlign.gz, tagAlign, bam or bam.gz) |
 
 * Optional arguments
 
-   | argument                | description                                     |
-   |-------------------------|-------------------------------------------------|
-   |-s=<min>:<step>:<max>    | strand shifts at which cross-correlation is evaluated, default=-500:5:1500 |
-   |-speak=<strPeak>         | user-defined cross-correlation peak strandshift |
-   |-x=<min>:<max>           | strand shifts to exclude (This is mainly to avoid region around phantom peak) default=10:(readlen+10) |
-   |-p=<nodes>               | number of parallel processing nodes, default=0  |
-   |-fdr=<falseDisoveryRate> | false discovery rate threshold for peak calling |
-   |-npeak=<numPeaks>        | threshold on number of peaks to call            |
-   |-tmpdir=<tempdir>        | temporary directory (if not specified R function `tempdir()` is used) |
-   |-filtchr=<chrnamePattern>| pattern to use to remove tags that map to specific chromosomes e.g. _ will remove all tags that map to chromosomes with _ in their name |
+   | argument                  | description                                     |
+   |---------------------------|-------------------------------------------------|
+   |-s=\<min\>:\<step\>:\<max\>| strand shifts at which cross-correlation is evaluated, default=-500:5:1500 |
+   |-speak=\<strPeak\>         | user-defined cross-correlation peak strandshift |
+   |-x=\<min\>:\<max\>         | strand shifts to exclude (This is mainly to avoid region around phantom peak) default=10:(readlen+10) |
+   |-p=\<nodes\>               | number of parallel processing nodes, default=0  |
+   |-fdr=\<falseDisoveryRate\> | false discovery rate threshold for peak calling |
+   |-npeak=\<numPeaks\>        | threshold on number of peaks to call            |
+   |-tmpdir=\<tempdir\>        | temporary directory (if not specified R function `tempdir()` is used) |
+   |-filtchr=\<chrnamePattern\>| pattern to use to remove tags that map to specific chromosomes e.g. _ will remove all tags that map to chromosomes with _ in their name |
 
 * Output arguments
 
-   | argument                  | description                                    |
-   |---------------------------|------------------------------------------------|
-   |-odir=<outputDirectory>    | name of output directory (If not set same as ChIP file directory is used) |
-   |-savn=<narrowpeakfilename> | NarrowPeak file name (fixed width peaks)       |
-   |-savn                      |                                                |
-   |-savr=<regionpeakfilename> | RegionPeak file name (variable width peaks with regions of enrichment around peak summits) |
-   |-savr                      |                                                |
-   |-savd=<rdatafile>          | save Rdata file                                |
-   |-savd                      |                                                |
-   |-savp=<plotdatafile>       | save cross-correlation plot                    |
-   |-savp                      |                                                |
-   |-out=<resultfile>          | append peakshift/phantomPeak results to a file |
-   |-rf                        | if plot or rdata or narrowPeak file exists replace it. If not used then the run is aborted if the plot or Rdata or narrowPeak file exists |
-   |-clean                     | if used it will remove the original chip and control files after reading them in. CAUTION: Use only if the script calling run_spp.R is creating temporary files |
+   | argument                   | description                                    |
+   |----------------------------|------------------------------------------------|
+   |-odir=\<outputDirectory\>   | name of output directory (If not set same as ChIP file directory is used) |
+   |-savn=\<narrowpeakfilename\>| NarrowPeak file name (fixed width peaks)       |
+   |-savn                       |                                                |
+   |-savr=\<regionpeakfilename\>| RegionPeak file name (variable width peaks with regions of enrichment around peak summits) |
+   |-savr                       |                                                |
+   |-savd=\<rdatafile\>         | save Rdata file                                |
+   |-savd                       |                                                |
+   |-savp=\<plotdatafile\>      | save cross-correlation plot                    |
+   |-savp                       |                                                |
+   |-out=\<resultfile\>         | append peakshift/phantomPeak results to a file |
+   |-rf                         | if plot or rdata or narrowPeak file exists replace it. If not used then the run is aborted if the plot or Rdata or narrowPeak file exists |
+   |-clean                      | if used it will remove the original chip and control files after reading them in. CAUTION: Use only if the script calling `run_spp.R` is creating temporary files |
 
 ## Typical usage
 
@@ -132,7 +132,7 @@ Usage: `Rscript run_spp.R <options>`
    |1   | Filename        | tagAlign/BAM filename                                                                                |
    |2   | numReads        | effective sequencing depth i.e. total number of mapped reads in input file                           |
    |3   | estFragLen      | comma separated strand cross-correlation peak(s) in decreasing order of correlation.                 |
-   |4   | corr_estFragLen | comma separated strand cross-correlation value(s) in decreasing order (col2 follows the same order)  |
+   |4   | corr_estFragLen | comma separated strand cross-correlation value(s) in decreasing order (COL2 follows the same order)  |
    |5   | phantomPeak     | Read length/phantom peak strand shift                                                                |
    |6   | corr_phantomPeak| Correlation value at phantom peak                                                                    |
    |7   | argmin_corr     | strand shift at which cross-correlation is lowest                                                    |
