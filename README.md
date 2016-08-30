@@ -69,14 +69,17 @@ You can add the following line to your `~/.bashrc` file
 Usage: `Rscript run_spp.R <options>`
 
 * Mandatory arguments
-  ```
-  -c=<ChIP_alignFile>, full path and name (or URL) of tagAlign/BAM file (can be gzipped) (FILE EXTENSION MUST BE tagAlign.gz, tagAlign, bam or bam.gz)
-  ```
+
+   ```
+   -c=<ChIP_alignFile>, full path and name (or URL) of tagAlign/BAM file (can be gzipped) (FILE EXTENSION MUST BE tagAlign.gz, tagAlign, bam or bam.gz)
+   ```
 * MANDATORY ARGUMENTS FOR PEAK CALLING
+
    ```
    -i=<Input_alignFile>, full path and name (or URL) of tagAlign/BAM file (can be gzipped) (FILE EXTENSION MUST BE tagAlign.gz, tagAlign, bam or bam.gz)
    ```
 * Optional arguments
+
    ```
    -s=<min>:<step>:<max> , strand shifts at which cross-correlation is evaluated, default=-500:5:1500
    -speak=<strPeak>, user-defined cross-correlation peak strandshift
@@ -88,6 +91,7 @@ Usage: `Rscript run_spp.R <options>`
    -filtchr=<chrnamePattern> , Pattern to use to remove tags that map to specific chromosomes e.g. _ will remove all tags that map to chromosomes with _ in their name
    ```
 * Output arguments
+
    ```
    -odir=<outputDirectory> name of output directory (If not set same as ChIP file directory is used)
    -savn=<narrowpeakfilename> OR -savn NarrowPeak file name (fixed width peaks)
@@ -108,19 +112,19 @@ Usage: `Rscript run_spp.R <options>`
    -out=<outFile> will create and/or append to a file named <outFile> several important characteristics of the dataset.
    ```
    The file contains 11 tab delimited columns
-   |col.| abbreviation    | description
-   |----|-----------------|-------------------------
-   |1   | Filename        | tagAlign/BAM filename
-   |2   | numReads        | effective sequencing depth i.e. total number of mapped reads in input file
-   |3   | estFragLen      | comma separated strand cross-correlation peak(s) in decreasing order of correlation.
-   |4   | corr_estFragLen | comma separated strand cross-correlation value(s) in decreasing order (col2 follows the same order)
-   |5   | phantomPeak     | Read length/phantom peak strand shift
-   |6   | corr_phantomPeak| Correlation value at phantom peak
-   |7   | argmin_corr     | strand shift at which cross-correlation is lowest
-   |8   | min_corr        | minimum value of cross-correlation
-   |9   | NSC             | Normalized strand cross-correlation coefficient (NSC) = COL4 / COL8
-   |10  | RSC             | Relative strand cross-correlation coefficient (RSC) = (COL4 - COL8) / (COL6 - COL8)
-   |11  | QualityTag      | Quality tag based on thresholded RSC (codes= -2:veryLow, -1:Low, 0:Medium, 1:High, 2:veryHigh)
+   |col.| abbreviation    | description                                                                                          |
+   |----|-----------------|------------------------------------------------------------------------------------------------------|
+   |1   | Filename        | tagAlign/BAM filename                                                                                |
+   |2   | numReads        | effective sequencing depth i.e. total number of mapped reads in input file                           |
+   |3   | estFragLen      | comma separated strand cross-correlation peak(s) in decreasing order of correlation.                 |
+   |4   | corr_estFragLen | comma separated strand cross-correlation value(s) in decreasing order (col2 follows the same order)  |
+   |5   | phantomPeak     | Read length/phantom peak strand shift                                                                |
+   |6   | corr_phantomPeak| Correlation value at phantom peak                                                                    |
+   |7   | argmin_corr     | strand shift at which cross-correlation is lowest                                                    |
+   |8   | min_corr        | minimum value of cross-correlation                                                                   |
+   |9   | NSC             | Normalized strand cross-correlation coefficient (NSC) = COL4 / COL8                                  |
+   |10  | RSC             | Relative strand cross-correlation coefficient (RSC) = (COL4 - COL8) / (COL6 - COL8)                  |
+   |11  | QualityTag      | Quality tag based on thresholded RSC (codes= -2:veryLow, -1:Low, 0:Medium, 1:High, 2:veryHigh)       |
 
    The top 3 local maxima locations that are within 90% of the maximum cross-correlation value are output.
 	  In almost all cases, the top (first) value in the list represents the predominant fragment length.
@@ -169,14 +173,14 @@ You MUST have samtools installed to use run_spp.R with BAM files
 
 2. **TagAlign files**: This a text-based BED3+3 alignment format that is easier to manipulate. It contains 6 tab delimited columns.
 
-   |col.| abbrv.     | type   | description
-   |----|------------|--------|---------------
-   |  1 | chrom      | string | Name of the chromosome
-   |  2 | chromStart | int    | The starting position of the feature in the chromosome. The first base in a chromosome is numbered 0.
-   |  3 | chromEnd   | int    | The ending position of the feature in the chromosome or scaffold. The chromEnd base is not included in the display of the feature. For example, the first 100 bases of a chromosome are defined as chromStart=0, chromEnd=100, and span the bases numbered 0-99.
-   |  4 | sequence   | string | Sequence of this read
-   |  5 | score      | int    | Indicates uniqueness or quality (preferably 1000/alignmentCount).
-   |  6 | strand     | char   | Orientation of this read (+ or -)
+   |col.| abbrv.     | type   | description                                                        |
+   |----|------------|--------|--------------------------------------------------------------------|
+   |  1 | chrom      | string | Name of the chromosome                                             |
+   |  2 | chromStart | int    | The starting position of the feature in the chromosome. The first base in a chromosome is numbered 0. |
+   |  3 | chromEnd   | int    | The ending position of the feature in the chromosome or scaffold. The chromEnd base is not included in the display of the feature. For example, the first 100 bases of a chromosome are defined as chromStart=0, chromEnd=100, and span the bases numbered 0-99. |
+   |  4 | sequence   | string | Sequence of this read                                              |
+   |  5 | score      | int    | Indicates uniqueness or quality (preferably 1000/alignmentCount).  |
+   |  6 | strand     | char   | Orientation of this read (+ or -)                                  |
 
 NOTE: You dont have to store the sequence of reads in the sequence field as the peak caller never really uses that field. You can just put the letter 'N' in that field. This saves space significantly.
 
@@ -194,18 +198,18 @@ samtools view -F 0x0204 -o - <bamFile> | awk 'BEGIN{OFS="\t"}{if (and($2,16) > 0
 
 1. **NarrowPeak/RegionPeak format**: The output peak file is in BED6+4 format known as tagAlign. It consists of 10 tab-delimited columns
    
-   |col.| abbrv.      | type   | description
-   |----|-------------|--------|--------------------------
-   |  1 | chrom       | string | Name of the chromosome
-   |  2 | chromStart  | int    | The starting position of the feature in the chromosome. The first base in a chromosome is numbered 0.
-   |  3 | chromEnd    | int    | The ending position of the feature in the chromosome or scaffold. The chromEnd base is not included in the display of the feature. For example, the first 100 bases of a chromosome are defined as chromStart=0, chromEnd=100, and span the bases numbered 0-99.
-   |  4 | name        | string | Name given to a region (preferably unique). Use '.' if no name is assigned.
-   |  5 | score       | int    | Indicates how dark the peak will be displayed in the browser (1-1000). If '0', the DCC will assign this based on signal value. Ideally average signalValue per base spread between 100-1000.
-   |  6 | strand      | char   | +/- to denote strand or orientation (whenever applicable). Use '.' if no orientation is assigned.
-   |  7 | signalValue | float  | Measurement of overall (usually, average) enrichment for the region.|
-   |  8 | pValue      | float  | Measurement of statistical signficance (-log10). Use -1 if no pValue is assigned.
-   |  9 | qValue      | float  | Measurement of statistical significance using false discovery rate (-log10). Use -1 if no qValue is assigned.
-   | 10 | peak        | int    | Point-source called for this peak; 0-based offset from chromStart. Use -1 if no point-source called.
+   |col.| abbrv.      | type   | description                                                     |
+   |----|-------------|--------|-----------------------------------------------------------------|
+   |  1 | chrom       | string | Name of the chromosome                                          |
+   |  2 | chromStart  | int    | The starting position of the feature in the chromosome. The first base in a chromosome is numbered 0. |
+   |  3 | chromEnd    | int    | The ending position of the feature in the chromosome or scaffold. The chromEnd base is not included in the display of the feature. For example, the first 100 bases of a chromosome are defined as chromStart=0, chromEnd=100, and span the bases numbered 0-99. |
+   |  4 | name        | string | Name given to a region (preferably unique). Use '.' if no name is assigned. |
+   |  5 | score       | int    | Indicates how dark the peak will be displayed in the browser (1-1000). If '0', the DCC will assign this based on signal value. Ideally average signalValue per base spread between 100-1000. |
+   |  6 | strand      | char   | +/- to denote strand or orientation (whenever applicable). Use '.' if no orientation is assigned. |
+   |  7 | signalValue | float  | Measurement of overall (usually, average) enrichment for the region. | 
+   |  8 | pValue      | float  | Measurement of statistical signficance (-log10). Use -1 if no pValue is assigned. |
+   |  9 | qValue      | float  | Measurement of statistical significance using false discovery rate (-log10). Use -1 if no qValue is assigned. |
+   | 10 | peak        | int    | Point-source called for this peak; 0-based offset from chromStart. Use -1 if no point-source called. |
 
 ## Peakcalling pipeline for IDR
 
