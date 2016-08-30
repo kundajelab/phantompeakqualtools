@@ -64,10 +64,13 @@ e.g synaptic package manager (`apt-get`) for ubuntu or emerge for gentoo.
 5. If your alignment files are BAM, you must have the samtools executable in your path so that the R script `run_spp.R` can call it using the `system()` command
 You can get samtools from (here)[http://samtools.sourceforge.net/]
 You can add the following line to your `~/.bashrc` file
+
    ```
    export PATH="<path_to_samtools_executable>:${PATH}"
    ```
+
 6. Run `run_spp.R`
+
    ```
    Rscript run_spp.R <options>
    ```
@@ -82,7 +85,7 @@ Usage: `Rscript run_spp.R <options>`
    |-------------------------|---------------------------------------------|
    |-c=\<ChIP_alignFile\>    | full path and name (or URL) of tagAlign/BAM file (can be gzipped) (FILE EXTENSION MUST BE tagAlign.gz, tagAlign, bam or bam.gz) |
    
-* MANDATORY ARGUMENTS FOR PEAK CALLING
+* Mandatory arguments for peak calling
 
    | argument                | description                                 |
    |-------------------------|---------------------------------------------|
