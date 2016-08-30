@@ -15,7 +15,7 @@ They can be used to
 
 If you are using the code or results in any formal publication please cite
 
-[1] Anshul Kundaje, Computer Science Dept., Stanford University, ENCODE Consortium, Personal Communication, Oct 2010
+[1] Landt SG1, Marinov GK, Kundaje A et al. ChIP-seq guidelines and practices of the ENCODE and modENCODE consortia. Genome Res. 2012 Sep;22(9):1813-31. doi: 10.1101/gr.136184.111.
 
 [2] Kharchenko PK, Tolstorukov MY, Park PJ, Design and analysis of ChIP-seq experiments for DNA-binding proteins Nat Biotechnol. 2008 Dec;26(12):1351-9
 
