@@ -32,17 +32,24 @@ NOTE: The current package does not run on a MacOS or Windows.
 
 ## Installation
 
-1. First make sure that you have installed R (version 2.10 or higher)
+1. First make sure that you have installed R (version 3.1 or higher)
+
 2. Also, you must have the Boost C++ libraries installed. Most linux distributions have these preinstalled.
 If not, you can easily get these from your standard package manager for your linux distribution.
 e.g synaptic package manager (`apt-get`) for ubuntu or emerge for gentoo.
-3. Install the following R packages
+
+3. Clone the repo.
+   ```
+   $ git clone https://github.com/kundajelab/phantompeakqualtools
+   ```
+4. Install the following R packages
    * snow (if you want parallel processing)
    * snowfall
    * bitops
    * caTools
    * Rsamtools (in the Bioconductor package)
    ```
+   $ cd phantompeakqualtools
    $ R
    (From within R)
    > install.packages("snow", repos="http://cran.us.r-project.org")
@@ -53,13 +60,14 @@ e.g synaptic package manager (`apt-get`) for ubuntu or emerge for gentoo.
    > biocLite("Rsamtools",suppressUpdates=TRUE)
    > install.packages("./spp_1.14.tar.gz")
    ```
-4) If your alignment files are BAM, you must have the samtools executable in your path so that the R script `run_spp.R` can call it using the system() command
-You can get samtools from here http://samtools.sourceforge.net/
+
+5. If your alignment files are BAM, you must have the samtools executable in your path so that the R script `run_spp.R` can call it using the `system()` command
+You can get samtools from (here)[http://samtools.sourceforge.net/]
 You can add the following line to your `~/.bashrc` file
    ```
    export PATH="<path_to_samtools_executable>:${PATH}"
    ```
-5) Run `run_spp.R`
+6. Run `run_spp.R`
    ```
    Rscript run_spp.R <options>
    ```
@@ -70,47 +78,53 @@ Usage: `Rscript run_spp.R <options>`
 
 * Mandatory arguments
 
-   ```
-   -c=<ChIP_alignFile>, full path and name (or URL) of tagAlign/BAM file (can be gzipped) (FILE EXTENSION MUST BE tagAlign.gz, tagAlign, bam or bam.gz)
-   ```
+   | argument                | description                                 |
+   |-------------------------|---------------------------------------------|
+   |-c=<ChIP_alignFile>      | full path and name (or URL) of tagAlign/BAM file (can be gzipped) (FILE EXTENSION MUST BE tagAlign.gz, tagAlign, bam or bam.gz) |
+   
 * MANDATORY ARGUMENTS FOR PEAK CALLING
 
-   ```
-   -i=<Input_alignFile>, full path and name (or URL) of tagAlign/BAM file (can be gzipped) (FILE EXTENSION MUST BE tagAlign.gz, tagAlign, bam or bam.gz)
-   ```
+   | argument                | description                                 |
+   |-------------------------|---------------------------------------------|
+   |-i=<Input_alignFile>     | full path and name (or URL) of tagAlign/BAM file (can be gzipped) (FILE EXTENSION MUST BE tagAlign.gz, tagAlign, bam or bam.gz) |
+
 * Optional arguments
 
-   ```
-   -s=<min>:<step>:<max> , strand shifts at which cross-correlation is evaluated, default=-500:5:1500
-   -speak=<strPeak>, user-defined cross-correlation peak strandshift
-   -x=<min>:<max>, strand shifts to exclude (This is mainly to avoid region around phantom peak) default=10:(readlen+10)
-   -p=<nodes> , number of parallel processing nodes, default=0
-   -fdr=<falseDisoveryRate> , false discovery rate threshold for peak calling
-   -npeak=<numPeaks>, threshold on number of peaks to call
-   -tmpdir=<tempdir> , Temporary directory (if not specified R function tempdir() is used)
-   -filtchr=<chrnamePattern> , Pattern to use to remove tags that map to specific chromosomes e.g. _ will remove all tags that map to chromosomes with _ in their name
-   ```
+   | argument                | description                                     |
+   |-------------------------|-------------------------------------------------|
+   |-s=<min>:<step>:<max>    | strand shifts at which cross-correlation is evaluated, default=-500:5:1500 |
+   |-speak=<strPeak>         | user-defined cross-correlation peak strandshift |
+   |-x=<min>:<max>           | strand shifts to exclude (This is mainly to avoid region around phantom peak) default=10:(readlen+10) |
+   |-p=<nodes>               | number of parallel processing nodes, default=0  |
+   |-fdr=<falseDisoveryRate> | false discovery rate threshold for peak calling |
+   |-npeak=<numPeaks>        | threshold on number of peaks to call            |
+   |-tmpdir=<tempdir>        | temporary directory (if not specified R function `tempdir()` is used) |
+   |-filtchr=<chrnamePattern>| pattern to use to remove tags that map to specific chromosomes e.g. _ will remove all tags that map to chromosomes with _ in their name |
+
 * Output arguments
 
-   ```
-   -odir=<outputDirectory> name of output directory (If not set same as ChIP file directory is used)
-   -savn=<narrowpeakfilename> OR -savn NarrowPeak file name (fixed width peaks)
-   -savr=<regionpeakfilename> OR -savr RegionPeak file name (variable width peaks with regions of enrichment around peak summits)
-   -savd=<rdatafile> OR -savd, save Rdata file
-   -savp=<plotdatafile> OR -savp, save cross-correlation plot
-   -out=<resultfile>, append peakshift/phantomPeak results to a file
-   -rf, if plot or rdata or narrowPeak file exists replace it. If not used then the run is aborted if the plot or Rdata or narrowPeak file exists
-   -clean, if used it will remove the original chip and control files after reading them in. CAUTION: Use only if the script calling run_spp.R is creating temporary files
-   ```
+   | argument                  | description                                    |
+   |---------------------------|------------------------------------------------|
+   |-odir=<outputDirectory>    | name of output directory (If not set same as ChIP file directory is used) |
+   |-savn=<narrowpeakfilename> | NarrowPeak file name (fixed width peaks)       |
+   |-savn                      |                                                |
+   |-savr=<regionpeakfilename> | RegionPeak file name (variable width peaks with regions of enrichment around peak summits) |
+   |-savr                      |                                                |
+   |-savd=<rdatafile>          | save Rdata file                                |
+   |-savd                      |                                                |
+   |-savp=<plotdatafile>       | save cross-correlation plot                    |
+   |-savp                      |                                                |
+   |-out=<resultfile>          | append peakshift/phantomPeak results to a file |
+   |-rf                        | if plot or rdata or narrowPeak file exists replace it. If not used then the run is aborted if the plot or Rdata or narrowPeak file exists |
+   |-clean                     | if used it will remove the original chip and control files after reading them in. CAUTION: Use only if the script calling run_spp.R is creating temporary files |
 
 ## Typical usage
 
-1. Determine strand cross-correlation peak / predominant fragment length OR print out quality measures
+1. Determine strand cross-correlation peak / predominant fragment length OR print out quality measures. `-out=<outFile>` will create and/or append to a file named <outFile> several important characteristics of the dataset.
    ```
    Rscript run_spp.R -c=<tagAlign/BAMfile> -savp -out=<outFile>
-   
-   -out=<outFile> will create and/or append to a file named <outFile> several important characteristics of the dataset.
    ```
+
    The file contains 11 tab delimited columns.
 
    |col.| abbreviation    | description                                                                                          |
@@ -128,8 +142,9 @@ Usage: `Rscript run_spp.R <options>`
    |11  | QualityTag      | Quality tag based on thresholded RSC (codes= -2:veryLow, -1:Low, 0:Medium, 1:High, 2:veryHigh)       |
 
    The top 3 local maxima locations that are within 90% of the maximum cross-correlation value are output.
-	  In almost all cases, the top (first) value in the list represents the predominant fragment length.
-	  If you want to keep only the top value simply run
+   In almost all cases, the top (first) value in the list represents the predominant fragment length.
+   If you want to keep only the top value simply run
+
    ```
    sed -r 's/,[^\t]+//g' <outFile> > <newOutFile>
    ```
