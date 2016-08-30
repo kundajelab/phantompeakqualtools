@@ -230,10 +230,9 @@ samtools view -F 0x0204 -o - <bamFile> | awk 'BEGIN{OFS="\t"}{if (and($2,16) > 0
    |  9 | qValue      | float  | Measurement of statistical significance using false discovery rate (-log10). Use -1 if no qValue is assigned. |
    | 10 | peak        | int    | Point-source called for this peak; 0-based offset from chromStart. Use -1 if no point-source called. |
 
-## Peakcalling pipeline for IDR
+## Releted pipelines and tools
 
-* [AQUAS ChIP-Seq pipeline](https://github.com/kundajelab/TF_chipseq_pipeline)
-* [IDR in Kundaje lab](https://sites.google.com/site/anshulkundaje/projects/idr)
+* [AQUAS Peakcalling pipeline for TF and histone ChIP-seq data](https://github.com/kundajelab/TF_chipseq_pipeline)
 
 ## References
 
@@ -242,3 +241,6 @@ Genome Res. 2012 Sep;22(9):1813-31. doi: 10.1101/gr.136184.111.
 
 ## Contributors
 * Anshul Kundaje - Assistant Professor, Dept. of Genetics, Stanford University (email: anshul AT kundaje DOT net)
+* Youngsook Lucy Jung - Postdoctoral Fellow, Park Lab, Harvard Medical School
+* Peter Kharchenko - Assistant Professor, Dept. of Biomedical Informatics, Harvard Medical School
+* Peter Park - Associate Professor, Dept. of Biomedical Informatics, Harvard Medical School
