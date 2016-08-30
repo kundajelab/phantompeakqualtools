@@ -6,9 +6,10 @@ This package computes quick but highly informative enrichment and quality measur
 
 This set of programs operate on mapped Illumina single-end read datasets in tagAlign or BAM format.
 They can be used to 
-1) Compute the predominant insert-size (fragment length) based on strand cross-correlation peak
-2) Compute Data quality measures based on relative phantom peak
-3) Call Peaks and regions for punctate binding datasets
+
+1. Compute the predominant insert-size (fragment length) based on strand cross-correlation peak
+2. Compute Data quality measures based on relative phantom peak
+3. Call Peaks and regions for punctate binding datasets
 
 ## Citations
 
@@ -26,16 +27,16 @@ NOTE: The current package does not run on a MacOS or Windows.
 
 ## Files
 
-1) `spp_1.14.tar.gz`  : modified SPP peak-caller package (The original SPP-peak caller package was written by Peter Kharchenko [2], https://github.com/hms-dbmi/spp)
-2) `run_spp.R` : The script to compute the frag length, data quality characteristics based on cross-correlation analysis and/or peak calling
+1. `spp_1.14.tar.gz` : modified SPP peak-caller package (The original SPP-peak caller package was written by Peter Kharchenko [2], https://github.com/hms-dbmi/spp)
+2. `run_spp.R` : The script to compute the frag length, data quality characteristics based on cross-correlation analysis and/or peak calling
 
 ## Installation
 
-1) First make sure that you have installed R (version 2.10 or higher)
-2) Also, you must have the Boost C++ libraries installed. Most linux distributions have these preinstalled.
+1. First make sure that you have installed R (version 2.10 or higher)
+2. Also, you must have the Boost C++ libraries installed. Most linux distributions have these preinstalled.
 If not, you can easily get these from your standard package manager for your linux distribution.
 e.g synaptic package manager (`apt-get`) for ubuntu or emerge for gentoo.
-3) Install the following R packages
+3. Install the following R packages
    * snow (if you want parallel processing)
    * snowfall
    * bitops
@@ -100,7 +101,7 @@ Usage: `Rscript run_spp.R <options>`
 
 ## Typical usage
 
-1) Determine strand cross-correlation peak / predominant fragment length OR print out quality measures
+1. Determine strand cross-correlation peak / predominant fragment length OR print out quality measures
    ```
    Rscript run_spp.R -c=<tagAlign/BAMfile> -savp -out=<outFile>
    
@@ -137,12 +138,12 @@ Usage: `Rscript run_spp.R <options>`
 
    Qtag is a thresholded version of RSC.
 
-2) Peak calling
+2. Peak calling
    ```
    Rscript run_spp.R -c=<ChIP_tagalign/BAM_file> -i=<control_tagalign/BAM_file> -fdr=<fdr> -odir=<peak_call_output_dir> -savr -savp -savd -rf
    Rscript run_spp.R -c=<ChIP_tagalign/BAM_file> -i=<control_tagalign/BAM_file> -npeak=<npeaks> -odir=<peak_call_output_dir> -savr -savp -savd -rf
    ```
-3) For IDR analysis you want to call a large number of peaks (relaxed threshold) so that the IDR model has access to a sufficient noise component.
+3. For IDR analysis you want to call a large number of peaks (relaxed threshold) so that the IDR model has access to a sufficient noise component.
 
    ```
    Rscript run_spp.R -c=<ChIP_tagalign/BAM_file> -i=<control_tagalign/BAM_file> -npeak=300000 -odir=<peak_call_output_dir> -savr -savp -rf -out=<resultFile>
@@ -163,10 +164,10 @@ However, it is useful to manually take a look at the cross-correlation plot to m
 
 ## Input file formats
 
-1) **BAM format**: This is a binary alignment format specified in http://samtools.sourceforge.net/SAM-1.3.pdf
+1. **BAM format**: This is a binary alignment format specified in http://samtools.sourceforge.net/SAM-1.3.pdf
 You MUST have samtools installed to use run_spp.R with BAM files
 
-2) **TagAlign files**: This a text-based BED3+3 alignment format that is easier to manipulate. It contains 6 tab delimited columns.
+2. **TagAlign files**: This a text-based BED3+3 alignment format that is easier to manipulate. It contains 6 tab delimited columns.
 
    |col.| abbrv.     | type   | description
    |----|------------|--------|---------------
@@ -191,7 +192,7 @@ samtools view -F 0x0204 -o - <bamFile> | awk 'BEGIN{OFS="\t"}{if (and($2,16) > 0
 
 ## Output file formats
 
-1) **NarrowPeak/RegionPeak format**: The output peak file is in BED6+4 format known as tagAlign. It consists of 10 tab-delimited columns
+1. **NarrowPeak/RegionPeak format**: The output peak file is in BED6+4 format known as tagAlign. It consists of 10 tab-delimited columns
    
    |col.| abbrv.      | type   | description
    |----|-------------|--------|--------------------------
