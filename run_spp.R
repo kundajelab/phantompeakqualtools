@@ -688,7 +688,7 @@ if (is.na(iparams$n.nodes)) {
 	cluster.nodes <- NULL
 } else {
 	library(snow)
-	cluster.nodes <- makeCluster(iparams$n.nodes)
+	cluster.nodes <- makeCluster(iparams$n.nodes,type="SOCK")
 }
 
 # #################################    
@@ -843,7 +843,7 @@ if ( !is.na(iparams$output.npeak.file) || !is.na(iparams$output.rpeak.file) ) {
 	if (is.na(iparams$n.nodes)) {
 		cluster.nodes <- NULL
 	} else {
-		cluster.nodes <- makeCluster(iparams$n.nodes)
+		cluster.nodes <- makeCluster(iparams$n.nodes,type="SOCK")
 	}
 	
 	# Find peaks
