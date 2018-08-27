@@ -1,3 +1,5 @@
+#!/usr/bin/env Rscript
+#
 # run_spp.R
 # =============
 # Author: Anshul Kundaje, Computer Science Dept., MIT
@@ -441,29 +443,12 @@ read.align <- function(align.filename) {
 		tmpDataRows <- read.table(align.filename,nrows=500)
 		chip.data$read.length <- round(median(tmpDataRows$V3 - tmpDataRows$V2))
 	} else if (grepl('(\\.tagAlign)?.*(\\.bam)',align.filename)) { # if bam file
-		# create BAM file name
-		bam2align.filename <- sub('\\.bam','.tagAlign',align.filename)
-		# generate command to convert bam to tagalign
-		command <- vector(length=2)
-		command[1] <- sprintf("samtools view -F 0x0204 -o - %s",align.filename)
-		command[2] <- paste("awk 'BEGIN{FS=" , '"\t"' , ";OFS=", '"\t"} {if (and($2,16) > 0) {print $3,($4-1),($4-1+length($10)),"N","1000","-"} else {print $3,($4-1),($4-1+length($10)),"N","1000","+"}}', "' 1> ", bam2align.filename, sep="")
-		# command[2] <- paste("awk 'BEGIN{OFS=", '"\t"} {if (and($2,16) > 0) {print $3,($4-1),($4-1+length($10)),"N","1000","-"} else {print $3,($4-1),($4-1+length($10)),"N","1000","+"}}', "' 1> ", bam2align.filename, sep="")	
-		command <- paste(command,collapse=" | ")
-		# Run command
-		status <- system(command,intern=FALSE,ignore.stderr=FALSE)
-		if ((status != 0) || !file.exists(bam2align.filename)) {
-			cat(sprintf("Error converting BAM to tagalign file: %s\n",align.filename),file=stderr())
-			q(save="no",status=1)
-		}
-		# read converted BAM file
-		chip.data <- read.tagalign.tags(bam2align.filename)
-		# get readlength info
-		tmpDataRows <- read.table(bam2align.filename,nrows=500)
-		chip.data$read.length <- round(median(tmpDataRows$V3 - tmpDataRows$V2))
-		# delete temporary tagalign file
-		file.remove(bam2align.filename)	
+		chip.data <- read.bam.tags(align.filename)
+		tmpReads <- scan(pipe(sprintf('samtools view %s | cut -f 10 | head -500 ',align.filename)),what=character(),quiet=TRUE)
+		tmpReadLengths <- nchar(tmpReads)
+		chip.data$read.length <- round(median(tmpReadLengths))
 	} else {
-		cat(sprintf("Error:Unknown file format for file:%s\n",align.fname),file=stderr())
+		cat(sprintf("Error:Unknown file format for file:%s\n",align.filename),file=stderr())
 		q(save="no",status=1)	
 	}
 	return(chip.data)
@@ -714,6 +699,7 @@ crosscorr$min.cc <- crosscorr$cross.correlation[ length(crosscorr$cross.correlat
 cat("Minimum cross-correlation value", crosscorr$min.cc$y,"\n",file=stdout())
 cat("Minimum cross-correlation shift", crosscorr$min.cc$x,"\n",file=stdout())
 sbw <- 2*floor(ceiling(5/iparams$sep.range[2]) / 2) + 1 # smoothing bandwidth
+library(caTools)
 cc$y <- runmean(cc$y,sbw,alg="fast")
 
 # Compute cross-correlation peak

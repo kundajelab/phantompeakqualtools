@@ -27,7 +27,7 @@ NOTE: The current package does not run on a MacOS or Windows.
 
 ## Files
 
-1. `spp_1.14.tar.gz` : modified SPP peak-caller package (The original SPP-peak caller package was written by Peter Kharchenko [2], https://github.com/hms-dbmi/spp)
+1. `spp_1.15.2.tar.gz` : modified SPP peak-caller package (The original SPP-peak caller package was written by Peter Kharchenko [2], https://github.com/hms-dbmi/spp)
 2. `run_spp.R` : The script to compute the frag length, data quality characteristics based on cross-correlation analysis and/or peak calling
 
 ## Installation
@@ -58,7 +58,7 @@ e.g synaptic package manager (`apt-get`) for ubuntu or emerge for gentoo.
    > install.packages("caTools", repos="http://cran.us.r-project.org")
    > source("http://bioconductor.org/biocLite.R")
    > biocLite("Rsamtools",suppressUpdates=TRUE)
-   > install.packages("./spp_1.14.tar.gz")
+   > install.packages("./spp_1.15.2.tar.gz")
    ```
 
 5. If your alignment files are BAM, you must have the samtools executable in your path so that the R script `run_spp.R` can call it using the `system()` command
