@@ -714,6 +714,7 @@ crosscorr$min.cc <- crosscorr$cross.correlation[ length(crosscorr$cross.correlat
 cat("Minimum cross-correlation value", crosscorr$min.cc$y,"\n",file=stdout())
 cat("Minimum cross-correlation shift", crosscorr$min.cc$x,"\n",file=stdout())
 sbw <- 2*floor(ceiling(5/iparams$sep.range[2]) / 2) + 1 # smoothing bandwidth
+library(caTools)
 cc$y <- runmean(cc$y,sbw,alg="fast")
 
 # Compute cross-correlation peak
