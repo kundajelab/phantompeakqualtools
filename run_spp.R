@@ -853,7 +853,7 @@ if ( !is.na(iparams$output.npeak.file) || !is.na(iparams$output.rpeak.file) ) {
 	if (!is.na(iparams$npeak)) {
 		iparams$fdr <- 0.99
 	}
-	narrow.peaks <- find.binding.positions(signal.data=chip.data,control.data=control.data,fdr=iparams$fdr,method=tag.lwcc,whs=crosscorr$whs,cluster=cluster.nodes)
+	narrow.peaks <- find.binding.positions(signal.data=chip.data,control.data=control.data,fdr=iparams$fdr,method=spp:::tag.lwcc,whs=crosscorr$whs,cluster=cluster.nodes)
 	if (!is.na(iparams$n.nodes)) {
 		stopCluster(cluster.nodes)
 	}
