@@ -1,3 +1,9 @@
+> **WARNING**: If you see the following error, then downgrade your `spp` to 1.14 or 1.15.x.
+```
+Error in lwcc(x, y, s, e, return.peaks = return.peaks, bg.x = bg.x, bg.y = bg.y,  :
+  INTEGER() can only be applied to a 'integer', not a 'character'
+```
+
 ## Summary
 
 This package computes informative enrichment and quality measures for ChIP-seq/DNase-seq/FAIRE-seq/MNase-seq data. It can also be used to obtain robust estimates of the predominant fragment length or characteristic tag shift values in these assays.
@@ -23,7 +29,7 @@ If you are using the code or results in any formal publication please cite
 
 NOTE: The current package does not run on a MacOS or Windows.
 * unix, bash, R (>=3.1), awk, samtools, boost C++ libraries
-* R packages: spp (>=1.14), caTools, snow, snowfall, bitops, Rsamtools (in Bioconductor)
+* R packages: spp (1.14, 1.15.x), caTools, snow, snowfall, bitops, Rsamtools (in Bioconductor)
 
 ## Files
 
